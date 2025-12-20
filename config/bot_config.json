@@ -1,0 +1,69 @@
+{
+  "checks": {
+    "spelling": true,
+    "custom_rules": true,
+    "spaces": true
+  },
+  
+  "ignore_words": [
+    "эксплойт",
+    "хайп",
+    "инста",
+    "телега",
+    "тг-канал",
+    "гигачат"
+  ],
+  
+  "custom_rules": [
+    {
+      "wrong": "Гига чат",
+      "correct": "Гигачат",
+      "case_sensitive": false
+    },
+    {
+      "wrong": "гигачат",
+      "correct": "Гигачат",
+      "case_sensitive": false
+    },
+    {
+      "wrong": "Chat GPT",
+      "correct": "ChatGPT",
+      "case_sensitive": false
+    },
+    {
+      "wrong": "chat gpt",
+      "correct": "ChatGPT",
+      "case_sensitive": false
+    },
+    {
+      "wrong": "ютуб",
+      "correct": "YouTube",
+      "case_sensitive": false
+    },
+    {
+      "wrong": "инстаграм",
+      "correct": "Instagram",
+      "case_sensitive": false
+    },
+    {
+      "wrong": "телеграмм",
+      "correct": "Telegram",
+      "case_sensitive": false
+    }
+  ],
+  
+  "space_checks": {
+    "multiple_spaces": true,
+    "space_before_punctuation": true,
+    "no_space_after_punctuation": true
+  },
+  
+  "response": {
+    "show_suggestions_count": 3,
+    "show_emoji": true
+  },
+  
+  "settings": {
+    "min_text_length": 50
+  }
+}
