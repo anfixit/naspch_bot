@@ -80,7 +80,9 @@ class ErrorFormatter:
 
         for i, error in enumerate(errors, 1):
             word = error.get("word", "")
-            suggestions = error.get("suggestions", [])[: self.max_suggestions]
+            suggestions = error.get("suggestions", [])[
+                : self.max_suggestions
+            ]
 
             if suggestions:
                 suggestion_text = ", ".join(f"«{s}»" for s in suggestions)

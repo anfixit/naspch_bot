@@ -82,7 +82,9 @@ class TextChecker:
         # Форматируем результат
         return self.formatter.format(errors)
 
-    def _perform_checks(self, text: str) -> Dict[str, List[Dict[str, Any]]]:
+    def _perform_checks(
+        self, text: str
+    ) -> Dict[str, List[Dict[str, Any]]]:
         """
         Выполняет все включенные проверки.
 

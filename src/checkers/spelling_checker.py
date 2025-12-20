@@ -11,7 +11,8 @@ class SpellingChecker(BaseChecker):
     """Проверка орфографии через Яндекс.Спеллер API."""
 
     YANDEX_SPELLER_URL = (
-        "https://speller.yandex.net/services/" "spellservice.json/checkText"
+        "https://speller.yandex.net/services/"
+        "spellservice.json/checkText"
     )
 
     def __init__(self, config: Dict[str, Any]):
@@ -22,7 +23,9 @@ class SpellingChecker(BaseChecker):
             config: Конфигурация с ignore_words
         """
         super().__init__(config)
-        self.ignore_words = [w.lower() for w in config.get("ignore_words", [])]
+        self.ignore_words = [
+            w.lower() for w in config.get("ignore_words", [])
+        ]
 
     def check(self, text: str) -> List[Dict[str, Any]]:
         """

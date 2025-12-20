@@ -10,7 +10,9 @@ class ChannelRulesChecker(BaseChecker):
     """Проверка правил для конкретных телеграм-каналов."""
 
     def __init__(
-        self, config: Dict[str, Any], channel_rules: Dict[str, Dict[str, Any]]
+        self,
+        config: Dict[str, Any],
+        channel_rules: Dict[str, Dict[str, Any]],
     ):
         """
         Инициализация проверки правил каналов.
@@ -76,7 +78,9 @@ class ChannelRulesChecker(BaseChecker):
         first_line = lines[0]
 
         # Ищем название канала в формате "ТГ-канал Название"
-        match = re.search(r"ТГ-канал\s+([^\(]+)", first_line, re.IGNORECASE)
+        match = re.search(
+            r"ТГ-канал\s+([^\(]+)", first_line, re.IGNORECASE
+        )
         if match:
             return match.group(1).strip()
 

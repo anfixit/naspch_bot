@@ -58,7 +58,9 @@ class MessageValidator:
 
         return text_to_check
 
-    def validate_and_extract(self, text: str) -> Tuple[bool, Optional[str]]:
+    def validate_and_extract(
+        self, text: str
+    ) -> Tuple[bool, Optional[str]]:
         """
         Валидирует сообщение и извлекает текст для проверки.
 
