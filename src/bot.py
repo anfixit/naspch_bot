@@ -8,21 +8,40 @@ from telegram.ext import Application, ContextTypes, MessageHandler, filters
 
 from .text_checker import TextChecker
 from .utils.config_loader import ConfigLoader
+from .utils.google_sheets_loader import GoogleSheetsLoader
 
 
 class SpellCheckBot:
     """Telegram-бот для проверки орфографии и грамматики."""
 
-    def __init__(self, token: str, config_path: str):
+    def __init__(
+        self,
+        token: str,
+        config_path: str,
+        google_credentials_path: str = None,
+        google_spreadsheet_id: str = None,
+    ):
         """
         Инициализация бота.
 
         Args:
             token: Токен Telegram-бота
             config_path: Путь к файлу конфигурации
+            google_credentials_path: Путь к credentials Google Sheets
+            google_spreadsheet_id: ID таблицы Google Sheets
         """
         self.token = token
-        self.config_loader = ConfigLoader(config_path)
+
+        # Инициализация Google Sheets (опционально)
+        google_loader = None
+        if google_credentials_path and google_spreadsheet_id:
+            google_loader = GoogleSheetsLoader(
+                google_credentials_path, google_spreadsheet_id
+            )
+
+        self.config_loader = ConfigLoader(
+            config_path, google_sheets_loader=google_loader
+        )
         self.text_checker = TextChecker(self.config_loader)
         self.application: Optional[Application] = None
 
@@ -86,7 +105,10 @@ class SpellCheckBot:
         config = self.config_loader.get()
 
         print("🚀 Запуск бота для проверки текстов")
-        print("📝 Проверка: орфография + кастомные правила " "+ пробелы")
+        print(
+            "📝 Проверка: орфография + кастомные правила "
+            "+ пробелы + правила каналов"
+        )
         print(
             f"📏 Минимальная длина текста: "
             f"{config.get('settings', {}).get('min_text_length', 50)} "

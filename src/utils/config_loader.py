@@ -3,20 +3,24 @@
 import json
 import os
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 class ConfigLoader:
     """Класс для загрузки и автообновления конфигурации."""
 
-    def __init__(self, config_path: str):
+    def __init__(
+        self, config_path: str, google_sheets_loader: Optional[Any] = None
+    ):
         """
         Инициализация загрузчика конфигурации.
 
         Args:
             config_path: Путь к файлу конфигурации
+            google_sheets_loader: Загрузчик Google Sheets (опционально)
         """
         self.config_path = config_path
+        self.google_sheets_loader = google_sheets_loader
         self.config: Dict[str, Any] = {}
         self.last_modified = 0
         self._load()
@@ -33,16 +37,44 @@ class ConfigLoader:
 
                 timestamp = datetime.now().strftime("%H:%M:%S")
                 print(f"[{timestamp}] ✅ Конфигурация " f"загружена/обновлена")
+
+                # Загружаем правила из Google Sheets
+                self._load_from_google_sheets()
+
         except Exception as e:
             print(f"Ошибка при загрузке конфигурации: {e}")
             self._use_defaults()
 
+    def _load_from_google_sheets(self) -> None:
+        """Загружает правила из Google Sheets если доступно."""
+        if not self.google_sheets_loader:
+            return
+
+        if not self.google_sheets_loader.is_available():
+            return
+
+        # Загружаем кастомные правила
+        custom_rules = self.google_sheets_loader.load_custom_rules()
+        if custom_rules:
+            self.config["custom_rules"] = custom_rules
+
+        # Загружаем правила каналов
+        channel_rules = self.google_sheets_loader.load_channel_rules()
+        if channel_rules:
+            self.config["channel_rules"] = channel_rules
+
     def _use_defaults(self) -> None:
         """Использует значения по умолчанию."""
         self.config = {
-            "checks": {"spelling": True, "custom_rules": True, "spaces": True},
+            "checks": {
+                "spelling": True,
+                "custom_rules": True,
+                "spaces": True,
+                "channel_rules": True,
+            },
             "ignore_words": [],
             "custom_rules": [],
+            "channel_rules": {},
             "space_checks": {
                 "multiple_spaces": True,
                 "space_before_punctuation": True,

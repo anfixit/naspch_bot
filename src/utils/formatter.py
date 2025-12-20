@@ -29,8 +29,9 @@ class ErrorFormatter:
         spelling = errors.get("spelling", [])
         custom = errors.get("custom", [])
         spaces = errors.get("spaces", [])
+        channel = errors.get("channel", [])
 
-        total = len(spelling) + len(custom) + len(spaces)
+        total = len(spelling) + len(custom) + len(spaces) + len(channel)
 
         if total == 0:
             return self._format_no_errors()
@@ -39,6 +40,7 @@ class ErrorFormatter:
         message += self._format_custom_errors(custom)
         message += self._format_spelling_errors(spelling)
         message += self._format_space_errors(spaces)
+        message += self._format_channel_errors(channel)
 
         return message
 
@@ -102,5 +104,24 @@ class ErrorFormatter:
             suggestion = error.get("suggestion", "")
 
             message += f"{i}. {msg}: «{word}» → «{suggestion}»\n"
+
+        return message
+
+    def _format_channel_errors(self, errors: List[Dict[str, Any]]) -> str:
+        """Форматирует ошибки правил каналов."""
+        if not errors:
+            return ""
+
+        emoji = "📢 " if self.show_emoji else ""
+        message = f"\n{emoji}**Правила канала:**\n"
+
+        for i, error in enumerate(errors, 1):
+            msg = error.get("message", "")
+            expected = error.get("expected", "")
+
+            if expected:
+                message += f"{i}. {msg}\n   Ожидается: {expected}\n"
+            else:
+                message += f"{i}. {msg}\n"
 
         return message

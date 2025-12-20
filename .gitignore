@@ -42,3 +42,4 @@ Thumbs.db
 # Временные файлы
 *.tmp
 *.bak
+config/google_credentials.json

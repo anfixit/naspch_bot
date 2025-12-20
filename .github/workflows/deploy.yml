@@ -93,8 +93,20 @@ jobs:
           pip install -q --upgrade pip
           pip install -q -r requirements.txt
           
-          echo "📁 Creating logs directory..."
-          mkdir -p logs
+          echo "📁 Creating directories..."
+          mkdir -p logs config
+          
+          echo "🔑 Creating .env file..."
+          cat > .env << ENVEOF
+          BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+          CONFIG_FILE=config/bot_config.json
+          LOG_LEVEL=INFO
+          GOOGLE_CREDENTIALS_PATH=${{ secrets.GOOGLE_CREDENTIALS_PATH }}
+          GOOGLE_SPREADSHEET_ID=${{ secrets.GOOGLE_SPREADSHEET_ID }}
+          ENVEOF
+          
+          echo "📝 Creating Google credentials..."
+          echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' > config/google_credentials.json
           
           echo "🔧 Setting up systemd service..."
           cp /tmp/naspch_bot.service /etc/systemd/system/
