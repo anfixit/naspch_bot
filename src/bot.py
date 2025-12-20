@@ -54,18 +54,13 @@ class SpellCheckBot:
         # Постоянная клавиатура с кнопками
         self.keyboard = ReplyKeyboardMarkup(
             [
-                [
-                    KeyboardButton(
-                        "🔄 Обновить правила"
-                    )
-                ],
+                [KeyboardButton("🔄 Обновить правила")],
                 [
                     KeyboardButton("📊 Статус"),
                     KeyboardButton("ℹ️ Помощь"),
                 ],
             ],
             resize_keyboard=True,
-            persistent=True,
         )
 
     def _get_rules_info(self) -> tuple:
