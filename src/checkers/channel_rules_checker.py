@@ -107,8 +107,8 @@ class ChannelRulesChecker(BaseChecker):
         if len(lines) < 2:
             return errors
 
-        # ИСПРАВЛЕНИЕ: убираем лишние пробелы и переносы
-        content = lines[1].strip()
+        # Берем текст КАК ЕСТЬ из таблицы
+        content = lines[1]
 
         # Проверяем что текст заканчивается на ожидаемую строку
         if not content.endswith(expected_ending):
