@@ -78,12 +78,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install safety bandit
+        pip install bandit
         pip install -r requirements.txt
-    
-    - name: Check dependencies for vulnerabilities
-      run: safety check --json
-      continue-on-error: true
     
     - name: Security scan with Bandit
       run: bandit -r src/ -f json
@@ -96,8 +92,6 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     
     steps:
-    - uses: actions/checkout@v3
-    
     - name: Deploy to server
       uses: appleboy/ssh-action@master
       with:
@@ -106,37 +100,40 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /opt/naspch_bot
+          
+          # Pull latest code
           git pull origin main
           
-          # Create virtual environment if not exists
-          if [ ! -d "venv" ]; then
-            python3 -m venv venv
-          fi
-          
-          # Activate venv and install dependencies
+          # Activate venv
           source venv/bin/activate
+          
+          # Install/update dependencies
           pip install --upgrade pip
           pip install -r requirements.txt
           
-          # Create .env if not exists
+          # Ensure .env exists
           if [ ! -f ".env" ]; then
             echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
             echo "CONFIG_FILE=config/bot_config.json" >> .env
             echo "LOG_LEVEL=INFO" >> .env
           fi
           
-          # Stop old bot process
+          # Create logs directory
+          mkdir -p logs
+          
+          # Stop old bot
           pkill -f "python3 main.py" || true
-          sleep 2
-          
-          # Start new bot process
-          nohup venv/bin/python3 main.py > logs/bot.log 2>&1 &
-          
-          # Wait and check if started
           sleep 3
+          
+          # Start new bot
+          nohup python3 main.py > logs/bot.log 2>&1 &
+          
+          # Wait and verify
+          sleep 5
           if pgrep -f "python3 main.py" > /dev/null; then
-            echo "✅ Bot started successfully"
+            echo "✅ Bot deployed and started successfully"
           else
-            echo "❌ Bot failed to start"
+            echo "❌ Bot failed to start, check logs"
+            tail -20 logs/bot.log
             exit 1
           fi
