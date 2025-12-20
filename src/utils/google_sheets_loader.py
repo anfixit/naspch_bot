@@ -10,9 +10,13 @@ from google.oauth2.service_account import Credentials
 class GoogleSheetsLoader:
     """Класс для загрузки правил из Google Sheets."""
 
-    SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    SCOPES = [
+        "https://www.googleapis.com/auth/spreadsheets.readonly"
+    ]
 
-    def __init__(self, credentials_path: str, spreadsheet_id: str):
+    def __init__(
+        self, credentials_path: str, spreadsheet_id: str
+    ):
         """
         Инициализация загрузчика Google Sheets.
 
@@ -41,7 +45,9 @@ class GoogleSheetsLoader:
             self.client = gspread.authorize(creds)
             print("✅ Подключено к Google Sheets")
         except Exception as e:
-            print(f"❌ Ошибка подключения к Google Sheets: {e}")
+            print(
+                f"❌ Ошибка подключения к Google Sheets: {e}"
+            )
             self.client = None
 
     def load_custom_rules(self) -> List[Dict[str, Any]]:
@@ -55,10 +61,11 @@ class GoogleSheetsLoader:
             return []
 
         try:
-            sheet = self.client.open_by_key(self.spreadsheet_id)
-            worksheet = sheet.get_worksheet(0)  # Первый лист
+            sheet = self.client.open_by_key(
+                self.spreadsheet_id
+            )
+            worksheet = sheet.get_worksheet(0)
 
-            # Получаем все значения (пропускаем заголовок)
             values = worksheet.get_all_values()[1:]
 
             rules = []
@@ -80,7 +87,8 @@ class GoogleSheetsLoader:
 
         except Exception as e:
             print(
-                f"❌ Ошибка загрузки кастомных правил " f"из Google Sheets: {e}"
+                f"❌ Ошибка загрузки кастомных правил "
+                f"из Google Sheets: {e}"
             )
             return []
 
@@ -95,10 +103,11 @@ class GoogleSheetsLoader:
             return {}
 
         try:
-            sheet = self.client.open_by_key(self.spreadsheet_id)
-            worksheet = sheet.get_worksheet(1)  # Второй лист
+            sheet = self.client.open_by_key(
+                self.spreadsheet_id
+            )
+            worksheet = sheet.get_worksheet(1)
 
-            # Получаем все значения (пропускаем заголовок)
             values = worksheet.get_all_values()[1:]
 
             channel_rules = {}
@@ -112,14 +121,15 @@ class GoogleSheetsLoader:
                     }
 
             print(
-                f"📋 Загружено правил для {len(channel_rules)} "
-                f"каналов из Google Sheets"
+                f"📋 Загружено правил для "
+                f"{len(channel_rules)} каналов из Google Sheets"
             )
             return channel_rules
 
         except Exception as e:
             print(
-                f"❌ Ошибка загрузки правил каналов " f"из Google Sheets: {e}"
+                f"❌ Ошибка загрузки правил каналов "
+                f"из Google Sheets: {e}"
             )
             return {}
 
