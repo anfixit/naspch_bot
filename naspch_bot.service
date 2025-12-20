@@ -1,0 +1,17 @@
+[Unit]
+Description=Telegram SpellCheck Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/naspch_bot
+Environment="PATH=/opt/naspch_bot/venv/bin"
+ExecStart=/opt/naspch_bot/venv/bin/python3 /opt/naspch_bot/main.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/opt/naspch_bot/logs/bot.log
+StandardError=append:/opt/naspch_bot/logs/bot.log
+
+[Install]
+WantedBy=multi-user.target

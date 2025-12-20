@@ -64,13 +64,23 @@ jobs:
     if: github.ref == 'refs/heads/main'
     
     steps:
+    - uses: actions/checkout@v3
+    
+    - name: Copy service file
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "naspch_bot.service"
+        target: "/tmp/"
+    
     - name: Deploy to server
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        command_timeout: 30m
         script: |
           set -e
           cd /opt/naspch_bot
@@ -83,26 +93,28 @@ jobs:
           pip install -q --upgrade pip
           pip install -q -r requirements.txt
           
-          echo "🛑 Stopping old bot..."
-          pkill -f "python3 main.py" || true
-          sleep 3
-          
           echo "📁 Creating logs directory..."
           mkdir -p logs
           
-          echo "🚀 Starting new bot..."
-          nohup python3 main.py > logs/bot.log 2>&1 &
+          echo "🔧 Setting up systemd service..."
+          cp /tmp/naspch_bot.service /etc/systemd/system/
+          systemctl daemon-reload
           
-          echo "⏳ Waiting for bot to start..."
-          sleep 5
+          echo "🛑 Stopping old bot..."
+          systemctl stop naspch_bot || true
           
-          if pgrep -f "python3 main.py" > /dev/null; then
+          echo "🚀 Starting bot service..."
+          systemctl enable naspch_bot
+          systemctl start naspch_bot
+          
+          echo "⏳ Waiting for service to start..."
+          sleep 3
+          
+          if systemctl is-active --quiet naspch_bot; then
             echo "✅ Bot deployed successfully!"
-            echo "📊 Process info:"
-            ps aux | grep "python3 main.py" | grep -v grep
+            systemctl status naspch_bot --no-pager
           else
             echo "❌ Bot failed to start!"
-            echo "📋 Last 30 lines of log:"
-            tail -30 logs/bot.log
+            journalctl -u naspch_bot -n 50 --no-pager
             exit 1
           fi
