@@ -50,12 +50,12 @@ class ChannelRulesChecker(BaseChecker):
         rules = self.channel_rules[channel_key]
         errors = []
 
-        # Проверяем формат подписи
-        signature_format = rules.get("signature_format", "")
-        if signature_format:
+        # Проверяем правило подписи
+        signature_rule = rules.get("signature_format", "")
+        if signature_rule:
             errors.extend(
-                self._check_signature_format(
-                    text, signature_format, channel_name
+                self._check_signature_rule(
+                    text, signature_rule, channel_name
                 )
             )
 
@@ -86,75 +86,44 @@ class ChannelRulesChecker(BaseChecker):
 
         return ""
 
-    def _check_signature_format(
-        self, text: str, expected_format: str, channel_name: str
+    def _check_signature_rule(
+        self, text: str, expected_ending: str, channel_name: str
     ) -> List[Dict[str, Any]]:
         """
-        Проверяет формат подписи канала.
+        Проверяет что текст заканчивается на нужную подпись.
 
         Args:
             text: Полный текст
-            expected_format: Ожидаемый формат
+            expected_ending: Ожидаемое окончание из таблицы
             channel_name: Название канала
 
         Returns:
-            Список ошибок формата
+            Список ошибок
         """
         errors = []
 
-        # Извлекаем подпись канала (@channel)
-        signature_match = re.search(r"@\w+", text)
+        # Убираем первую строку (заголовок с каналом)
+        lines = text.split("\n", 1)
+        if len(lines) < 2:
+            return errors
 
-        if not signature_match:
+        content = lines[1]
+
+        # Проверяем что текст заканчивается на ожидаемую строку
+        if not content.endswith(expected_ending):
             errors.append(
                 {
                     "type": "channel_signature",
                     "message": (
-                        f"Отсутствует подпись канала "
-                        f"для {channel_name}"
+                        f"Неправильная подпись для канала "
+                        f"{channel_name}"
                     ),
-                    "expected": expected_format,
+                    "expected": (
+                        f"Текст должен заканчиваться на: "
+                        f"«{expected_ending}»"
+                    ),
                 }
             )
-            return errors
-
-        signature = signature_match.group(0)
-        signature_pos = signature_match.start()
-
-        # Проверяем формат подписи
-        if "перенос строки" in expected_format.lower():
-            # Подпись должна быть на новой строке
-            if (
-                signature_pos == 0
-                or text[signature_pos - 1] != "\n"
-            ):
-                errors.append(
-                    {
-                        "type": "channel_signature",
-                        "message": (
-                            f"Подпись {signature} должна быть "
-                            f"через перенос строки"
-                        ),
-                        "expected": f"...текст\n{signature}",
-                    }
-                )
-
-        elif "пробел" in expected_format.lower():
-            # Подпись должна быть через пробел
-            if (
-                signature_pos > 0
-                and text[signature_pos - 1] == "\n"
-            ):
-                errors.append(
-                    {
-                        "type": "channel_signature",
-                        "message": (
-                            f"Подпись {signature} должна быть "
-                            f"через пробел, а не на новой строке"
-                        ),
-                        "expected": f"...текст {signature}",
-                    }
-                )
 
         return errors
 
