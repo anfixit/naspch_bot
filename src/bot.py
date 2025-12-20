@@ -3,9 +3,10 @@
 from datetime import datetime
 from typing import Optional
 
-from telegram import Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     Application,
+    CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
     MessageHandler,
@@ -51,6 +52,101 @@ class SpellCheckBot:
         self.text_checker = TextChecker(self.config_loader)
         self.application: Optional[Application] = None
 
+    async def handle_start(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """
+        Обработчик команды /start.
+
+        Args:
+            update: Объект обновления от Telegram
+            context: Контекст обработчика
+        """
+        if not update.message:
+            return
+
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    "🔄 Обновить правила из Google Sheets",
+                    callback_data="reload_rules",
+                )
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        config = self.config_loader.get()
+        custom_rules_count = len(config.get("custom_rules", []))
+        channel_rules_count = len(
+            config.get("channel_rules", {})
+        )
+
+        await update.message.reply_text(
+            "👋 **Привет! Я бот для проверки текстов.**\n\n"
+            "📝 Я проверяю:\n"
+            "• Орфографию\n"
+            "• Кастомные правила написания\n"
+            "• Пробелы\n"
+            "• Правила каналов\n\n"
+            f"📊 **Текущие правила:**\n"
+            f"📌 Кастомных: {custom_rules_count}\n"
+            f"📢 Каналов: {channel_rules_count}\n\n"
+            "💡 Отправь сообщение с ссылкой на канал "
+            "для проверки!",
+            reply_markup=reply_markup,
+            parse_mode="Markdown",
+        )
+
+    async def handle_reload_callback(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """
+        Обработчик нажатия кнопки обновления правил.
+
+        Args:
+            update: Объект обновления от Telegram
+            context: Контекст обработчика
+        """
+        query = update.callback_query
+        await query.answer()
+
+        username = (
+            query.from_user.username or query.from_user.id
+        )
+        timestamp = datetime.now().strftime("%H:%M:%S")
+
+        print(
+            f"[{timestamp}] Кнопка 'Обновить правила' "
+            f"от {username}"
+        )
+
+        # Перезагружаем конфигурацию
+        self.config_loader.reload()
+        self.text_checker._init_components()
+
+        # Подсчитываем правила
+        config = self.config_loader.get()
+        custom_rules_count = len(config.get("custom_rules", []))
+        channel_rules_count = len(
+            config.get("channel_rules", {})
+        )
+
+        response = (
+            "🔄 **Правила перезагружены!**\n\n"
+            f"📌 Кастомных правил: {custom_rules_count}\n"
+            f"📢 Правил каналов: {channel_rules_count}"
+        )
+
+        await query.edit_message_text(
+            response, parse_mode="Markdown"
+        )
+
+        print(
+            f"[{timestamp}] Правила перезагружены: "
+            f"{custom_rules_count} кастомных, "
+            f"{channel_rules_count} каналов"
+        )
+
     async def handle_reload(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
@@ -86,7 +182,7 @@ class SpellCheckBot:
         )
 
         response = (
-            "🔄 **Правила перезагружены из Google Sheets!**\n\n"
+            "🔄 **Правила перезагружены!**\n\n"
             f"📌 Кастомных правил: {custom_rules_count}\n"
             f"📢 Правил каналов: {channel_rules_count}"
         )
@@ -181,7 +277,16 @@ class SpellCheckBot:
 
         # Добавляем обработчики
         self.application.add_handler(
+            CommandHandler("start", self.handle_start)
+        )
+        self.application.add_handler(
             CommandHandler("reload", self.handle_reload)
+        )
+        self.application.add_handler(
+            CallbackQueryHandler(
+                self.handle_reload_callback,
+                pattern="^reload_rules$",
+            )
         )
         self.application.add_handler(
             MessageHandler(
@@ -192,7 +297,8 @@ class SpellCheckBot:
 
         print("✅ Бот запущен и готов к работе!")
         print("💡 Команды:")
-        print("   /reload - перезагрузить правила из Google Sheets")
+        print("   /start - показать меню с кнопкой")
+        print("   /reload - перезагрузить правила")
         print("⏹️  Нажмите Ctrl+C для остановки\n")
 
         # Запускаем бота
