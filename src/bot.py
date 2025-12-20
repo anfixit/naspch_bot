@@ -1,6 +1,5 @@
 """Главный модуль Telegram-бота для проверки текстов."""
 
-import os
 from datetime import datetime
 from typing import Optional
 
