@@ -13,11 +13,8 @@ class ErrorFormatter:
         Args:
             config: Конфигурация response
         """
-        self.show_emoji = config.get('show_emoji', True)
-        self.max_suggestions = config.get(
-            'show_suggestions_count',
-            3
-        )
+        self.show_emoji = config.get("show_emoji", True)
+        self.max_suggestions = config.get("show_suggestions_count", 3)
 
     def format(self, errors: Dict[str, List[Dict]]) -> str:
         """
@@ -29,9 +26,9 @@ class ErrorFormatter:
         Returns:
             Отформатированное сообщение
         """
-        spelling = errors.get('spelling', [])
-        custom = errors.get('custom', [])
-        spaces = errors.get('spaces', [])
+        spelling = errors.get("spelling", [])
+        custom = errors.get("custom", [])
+        spaces = errors.get("spaces", [])
 
         total = len(spelling) + len(custom) + len(spaces)
 
@@ -56,10 +53,7 @@ class ErrorFormatter:
         emoji = "❌" if self.show_emoji else ""
         return f"{emoji} Найдено ошибок: {total}\n\n"
 
-    def _format_custom_errors(
-        self,
-        errors: List[Dict[str, Any]]
-    ) -> str:
+    def _format_custom_errors(self, errors: List[Dict[str, Any]]) -> str:
         """Форматирует кастомные ошибки."""
         if not errors:
             return ""
@@ -68,16 +62,13 @@ class ErrorFormatter:
         message = f"{emoji}**Неправильное написание:**\n"
 
         for i, error in enumerate(errors, 1):
-            word = error.get('word', '')
-            suggestion = error.get('suggestion', '')
+            word = error.get("word", "")
+            suggestion = error.get("suggestion", "")
             message += f"{i}. «{word}» → «{suggestion}»\n"
 
         return message + "\n"
 
-    def _format_spelling_errors(
-        self,
-        errors: List[Dict[str, Any]]
-    ) -> str:
+    def _format_spelling_errors(self, errors: List[Dict[str, Any]]) -> str:
         """Форматирует орфографические ошибки."""
         if not errors:
             return ""
@@ -86,28 +77,18 @@ class ErrorFormatter:
         message = f"{emoji}**Орфография:**\n"
 
         for i, error in enumerate(errors, 1):
-            word = error.get('word', '')
-            suggestions = error.get(
-                'suggestions',
-                []
-            )[:self.max_suggestions]
+            word = error.get("word", "")
+            suggestions = error.get("suggestions", [])[: self.max_suggestions]
 
             if suggestions:
-                suggestion_text = ', '.join(
-                    f"«{s}»" for s in suggestions
-                )
-                message += (
-                    f"{i}. «{word}» → {suggestion_text}\n"
-                )
+                suggestion_text = ", ".join(f"«{s}»" for s in suggestions)
+                message += f"{i}. «{word}» → {suggestion_text}\n"
             else:
                 message += f"{i}. «{word}» — нет вариантов\n"
 
         return message + "\n"
 
-    def _format_space_errors(
-        self,
-        errors: List[Dict[str, Any]]
-    ) -> str:
+    def _format_space_errors(self, errors: List[Dict[str, Any]]) -> str:
         """Форматирует ошибки с пробелами."""
         if not errors:
             return ""
@@ -116,12 +97,10 @@ class ErrorFormatter:
         message = f"{emoji}**Пробелы:**\n"
 
         for i, error in enumerate(errors, 1):
-            msg = error.get('message', '')
-            word = error.get('word', '')
-            suggestion = error.get('suggestion', '')
+            msg = error.get("message", "")
+            word = error.get("word", "")
+            suggestion = error.get("suggestion", "")
 
-            message += (
-                f"{i}. {msg}: «{word}» → «{suggestion}»\n"
-            )
+            message += f"{i}. {msg}: «{word}» → «{suggestion}»\n"
 
         return message

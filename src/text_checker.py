@@ -32,13 +32,10 @@ class TextChecker:
         self.space_checker = SpaceChecker(config)
 
         # Инициализация утилит
-        response_config = config.get('response', {})
+        response_config = config.get("response", {})
         self.formatter = ErrorFormatter(response_config)
 
-        min_length = config.get(
-            'settings',
-            {}
-        ).get('min_text_length', 50)
+        min_length = config.get("settings", {}).get("min_text_length", 50)
         self.validator = MessageValidator(min_length)
 
     def reload_config(self) -> None:
@@ -73,9 +70,7 @@ class TextChecker:
         self.reload_config()
 
         # Валидация и извлечение текста
-        is_valid, text_to_check = (
-            self.validator.validate_and_extract(text)
-        )
+        is_valid, text_to_check = self.validator.validate_and_extract(text)
 
         if not is_valid or text_to_check is None:
             return ""
@@ -86,10 +81,7 @@ class TextChecker:
         # Форматируем результат
         return self.formatter.format(errors)
 
-    def _perform_checks(
-        self,
-        text: str
-    ) -> Dict[str, List[Dict[str, Any]]]:
+    def _perform_checks(self, text: str) -> Dict[str, List[Dict[str, Any]]]:
         """
         Выполняет все включенные проверки.
 
@@ -99,29 +91,21 @@ class TextChecker:
         Returns:
             Словарь с результатами проверок
         """
-        results = {
-            'spelling': [],
-            'custom': [],
-            'spaces': []
-        }
+        results = {"spelling": [], "custom": [], "spaces": []}
 
         # Кастомные правила (проверяем первыми)
         if self.custom_rules_checker.is_enabled():
             print("  → Проверка кастомных правил...")
-            results['custom'] = (
-                self.custom_rules_checker.check(text)
-            )
+            results["custom"] = self.custom_rules_checker.check(text)
 
         # Орфография
         if self.spelling_checker.is_enabled():
             print("  → Проверка орфографии...")
-            results['spelling'] = (
-                self.spelling_checker.check(text)
-            )
+            results["spelling"] = self.spelling_checker.check(text)
 
         # Пробелы
         if self.space_checker.is_enabled():
             print("  → Проверка пробелов...")
-            results['spaces'] = self.space_checker.check(text)
+            results["spaces"] = self.space_checker.check(text)
 
         return results

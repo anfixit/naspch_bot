@@ -27,19 +27,12 @@ class ConfigLoader:
             current_mtime = os.path.getmtime(self.config_path)
 
             if current_mtime > self.last_modified:
-                with open(
-                    self.config_path,
-                    'r',
-                    encoding='utf-8'
-                ) as f:
+                with open(self.config_path, "r", encoding="utf-8") as f:
                     self.config = json.load(f)
                 self.last_modified = current_mtime
 
-                timestamp = datetime.now().strftime('%H:%M:%S')
-                print(
-                    f"[{timestamp}] ✅ Конфигурация "
-                    f"загружена/обновлена"
-                )
+                timestamp = datetime.now().strftime("%H:%M:%S")
+                print(f"[{timestamp}] ✅ Конфигурация " f"загружена/обновлена")
         except Exception as e:
             print(f"Ошибка при загрузке конфигурации: {e}")
             self._use_defaults()
@@ -47,25 +40,16 @@ class ConfigLoader:
     def _use_defaults(self) -> None:
         """Использует значения по умолчанию."""
         self.config = {
-            "checks": {
-                "spelling": True,
-                "custom_rules": True,
-                "spaces": True
-            },
+            "checks": {"spelling": True, "custom_rules": True, "spaces": True},
             "ignore_words": [],
             "custom_rules": [],
             "space_checks": {
                 "multiple_spaces": True,
                 "space_before_punctuation": True,
-                "no_space_after_punctuation": True
+                "no_space_after_punctuation": True,
             },
-            "response": {
-                "show_suggestions_count": 3,
-                "show_emoji": True
-            },
-            "settings": {
-                "min_text_length": 50
-            }
+            "response": {"show_suggestions_count": 3, "show_emoji": True},
+            "settings": {"min_text_length": 50},
         }
 
     def reload(self) -> bool:

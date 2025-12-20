@@ -29,17 +29,14 @@ class MessageValidator:
         if not text:
             return False
 
-        lines = text.split('\n', 1)
+        lines = text.split("\n", 1)
         if not lines:
             return False
 
         first_line = lines[0]
-        return bool(re.search(r't\.me/\w+', first_line))
+        return bool(re.search(r"t\.me/\w+", first_line))
 
-    def extract_text_to_check(
-        self,
-        text: str
-    ) -> Optional[str]:
+    def extract_text_to_check(self, text: str) -> Optional[str]:
         """
         Извлекает текст для проверки (убирает первую строку).
 
@@ -49,7 +46,7 @@ class MessageValidator:
         Returns:
             Текст для проверки или None если текст слишком короткий
         """
-        lines = text.split('\n', 1)
+        lines = text.split("\n", 1)
 
         if len(lines) > 1:
             text_to_check = lines[1]
@@ -61,10 +58,7 @@ class MessageValidator:
 
         return text_to_check
 
-    def validate_and_extract(
-        self,
-        text: str
-    ) -> Tuple[bool, Optional[str]]:
+    def validate_and_extract(self, text: str) -> Tuple[bool, Optional[str]]:
         """
         Валидирует сообщение и извлекает текст для проверки.
 

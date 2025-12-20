@@ -16,7 +16,7 @@ class CustomRulesChecker(BaseChecker):
             config: Конфигурация с custom_rules
         """
         super().__init__(config)
-        self.custom_rules = config.get('custom_rules', [])
+        self.custom_rules = config.get("custom_rules", [])
 
     def check(self, text: str) -> List[Dict[str, Any]]:
         """
@@ -31,9 +31,9 @@ class CustomRulesChecker(BaseChecker):
         errors = []
 
         for rule in self.custom_rules:
-            wrong = rule.get('wrong', '')
-            correct = rule.get('correct', '')
-            case_sensitive = rule.get('case_sensitive', False)
+            wrong = rule.get("wrong", "")
+            correct = rule.get("correct", "")
+            case_sensitive = rule.get("case_sensitive", False)
 
             if not wrong or not correct:
                 continue
@@ -42,18 +42,17 @@ class CustomRulesChecker(BaseChecker):
             flags = 0 if case_sensitive else re.IGNORECASE
 
             for match in re.finditer(pattern, text, flags):
-                errors.append({
-                    'type': 'custom',
-                    'word': match.group(),
-                    'suggestion': correct,
-                    'message': 'Неправильное написание'
-                })
+                errors.append(
+                    {
+                        "type": "custom",
+                        "word": match.group(),
+                        "suggestion": correct,
+                        "message": "Неправильное написание",
+                    }
+                )
 
         return errors
 
     def is_enabled(self) -> bool:
         """Проверяет, включена ли проверка кастомных правил."""
-        return self.config.get('checks', {}).get(
-            'custom_rules',
-            True
-        )
+        return self.config.get("checks", {}).get("custom_rules", True)

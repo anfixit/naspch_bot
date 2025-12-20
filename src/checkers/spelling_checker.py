@@ -9,8 +9,7 @@ class SpellingChecker(BaseChecker):
     """Проверка орфографии через Яндекс.Спеллер API."""
 
     YANDEX_SPELLER_URL = (
-        "https://speller.yandex.net/services/"
-        "spellservice.json/checkText"
+        "https://speller.yandex.net/services/" "spellservice.json/checkText"
     )
 
     def __init__(self, config: Dict[str, Any]):
@@ -21,9 +20,7 @@ class SpellingChecker(BaseChecker):
             config: Конфигурация с ignore_words
         """
         super().__init__(config)
-        self.ignore_words = [
-            w.lower() for w in config.get('ignore_words', [])
-        ]
+        self.ignore_words = [w.lower() for w in config.get("ignore_words", [])]
 
     def check(self, text: str) -> List[Dict[str, Any]]:
         """
@@ -36,16 +33,10 @@ class SpellingChecker(BaseChecker):
             Список орфографических ошибок
         """
         try:
-            params = {
-                'text': text,
-                'lang': 'ru',
-                'options': 0
-            }
+            params = {"text": text, "lang": "ru", "options": 0}
 
             response = requests.get(
-                self.YANDEX_SPELLER_URL,
-                params=params,
-                timeout=10
+                self.YANDEX_SPELLER_URL, params=params, timeout=10
             )
             response.raise_for_status()
 
@@ -57,8 +48,7 @@ class SpellingChecker(BaseChecker):
             return []
 
     def _format_errors(
-        self,
-        errors: List[Dict[str, Any]]
+        self, errors: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
         """
         Форматирует ошибки в единый формат.
@@ -71,16 +61,18 @@ class SpellingChecker(BaseChecker):
         """
         formatted = []
         for error in errors:
-            word = error.get('word', '')
+            word = error.get("word", "")
             if word.lower() not in self.ignore_words:
-                formatted.append({
-                    'type': 'spelling',
-                    'word': word,
-                    'suggestions': error.get('s', []),
-                    'message': 'Орфографическая ошибка'
-                })
+                formatted.append(
+                    {
+                        "type": "spelling",
+                        "word": word,
+                        "suggestions": error.get("s", []),
+                        "message": "Орфографическая ошибка",
+                    }
+                )
         return formatted
 
     def is_enabled(self) -> bool:
         """Проверяет, включена ли проверка орфографии."""
-        return self.config.get('checks', {}).get('spelling', True)
+        return self.config.get("checks", {}).get("spelling", True)

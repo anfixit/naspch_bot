@@ -5,12 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 from telegram import Update
-from telegram.ext import (
-    Application,
-    MessageHandler,
-    filters,
-    ContextTypes
-)
+from telegram.ext import Application, MessageHandler, filters, ContextTypes
 
 from .text_checker import TextChecker
 from .utils.config_loader import ConfigLoader
@@ -19,11 +14,7 @@ from .utils.config_loader import ConfigLoader
 class SpellCheckBot:
     """Telegram-бот для проверки орфографии и грамматики."""
 
-    def __init__(
-        self,
-        token: str,
-        config_path: str
-    ):
+    def __init__(self, token: str, config_path: str):
         """
         Инициализация бота.
 
@@ -37,9 +28,7 @@ class SpellCheckBot:
         self.application: Optional[Application] = None
 
     async def handle_message(
-        self,
-        update: Update,
-        context: ContextTypes.DEFAULT_TYPE
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """
         Обработчик входящих сообщений.
@@ -59,15 +48,12 @@ class SpellCheckBot:
 
         # Логируем обработку
         username = (
-            update.message.from_user.username
-            or update.message.from_user.id
+            update.message.from_user.username or update.message.from_user.id
         )
-        timestamp = datetime.now().strftime('%H:%M:%S')
+        timestamp = datetime.now().strftime("%H:%M:%S")
 
         print(f"\n{'=' * 50}")
-        print(
-            f"[{timestamp}] Проверяю сообщение от {username}"
-        )
+        print(f"[{timestamp}] Проверяю сообщение от {username}")
 
         # Выполняем проверку
         response = self.text_checker.check_text(text)
@@ -77,7 +63,7 @@ class SpellCheckBot:
             await update.message.reply_text(
                 response,
                 reply_to_message_id=update.message.message_id,
-                parse_mode='Markdown'
+                parse_mode="Markdown",
             )
 
             print(f"[{timestamp}] Отправлен ответ")
@@ -85,9 +71,7 @@ class SpellCheckBot:
         print(f"{'=' * 50}\n")
 
     async def error_handler(
-        self,
-        update: Update,
-        context: ContextTypes.DEFAULT_TYPE
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """
         Обработчик ошибок бота.
@@ -103,10 +87,7 @@ class SpellCheckBot:
         config = self.config_loader.get()
 
         print("🚀 Запуск бота для проверки текстов")
-        print(
-            "📝 Проверка: орфография + кастомные правила "
-            "+ пробелы"
-        )
+        print("📝 Проверка: орфография + кастомные правила " "+ пробелы")
         print(
             f"📏 Минимальная длина текста: "
             f"{config.get('settings', {}).get('min_text_length', 50)} "
@@ -114,15 +95,12 @@ class SpellCheckBot:
         )
 
         # Создаем приложение
-        self.application = (
-            Application.builder().token(self.token).build()
-        )
+        self.application = Application.builder().token(self.token).build()
 
         # Добавляем обработчики
         self.application.add_handler(
             MessageHandler(
-                filters.TEXT & ~filters.COMMAND,
-                self.handle_message
+                filters.TEXT & ~filters.COMMAND, self.handle_message
             )
         )
         self.application.add_error_handler(self.error_handler)
@@ -131,6 +109,4 @@ class SpellCheckBot:
         print("⏹️  Нажмите Ctrl+C для остановки\n")
 
         # Запускаем бота
-        self.application.run_polling(
-            allowed_updates=Update.ALL_TYPES
-        )
+        self.application.run_polling(allowed_updates=Update.ALL_TYPES)
