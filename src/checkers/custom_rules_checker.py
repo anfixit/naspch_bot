@@ -1,7 +1,8 @@
 """Проверка по кастомным правилам написания."""
 
 import re
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from .base_checker import BaseChecker
 
 

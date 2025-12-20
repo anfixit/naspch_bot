@@ -1,9 +1,10 @@
 """Главный класс для управления всеми проверками текста."""
 
-from typing import Dict, List, Any
-from .checkers.spelling_checker import SpellingChecker
+from typing import Any, Dict, List
+
 from .checkers.custom_rules_checker import CustomRulesChecker
 from .checkers.space_checker import SpaceChecker
+from .checkers.spelling_checker import SpellingChecker
 from .utils.config_loader import ConfigLoader
 from .utils.formatter import ErrorFormatter
 from .utils.message_validator import MessageValidator

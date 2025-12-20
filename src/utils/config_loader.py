@@ -1,9 +1,9 @@
 """Загрузка и управление конфигурацией бота."""
 
-import os
 import json
-from typing import Dict, Any
+import os
 from datetime import datetime
+from typing import Any, Dict
 
 
 class ConfigLoader:

@@ -1,6 +1,6 @@
 """Форматирование ответов бота с найденными ошибками."""
 
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class ErrorFormatter:

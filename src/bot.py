@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 from telegram import Update
-from telegram.ext import Application, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, ContextTypes, MessageHandler, filters
 
 from .text_checker import TextChecker
 from .utils.config_loader import ConfigLoader
