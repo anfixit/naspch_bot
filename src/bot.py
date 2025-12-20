@@ -66,8 +66,7 @@ class SpellCheckBot:
 
         # Логируем обработку
         username = (
-            update.message.from_user.username
-            or update.message.from_user.id
+            update.message.from_user.username or update.message.from_user.id
         )
         timestamp = datetime.now().strftime("%H:%M:%S")
 

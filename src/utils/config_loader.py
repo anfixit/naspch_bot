@@ -36,9 +36,7 @@ class ConfigLoader:
                 self.last_modified = current_mtime
 
                 timestamp = datetime.now().strftime("%H:%M:%S")
-                print(
-                    f"[{timestamp}] ✅ Конфигурация " f"загружена/обновлена"
-                )
+                print(f"[{timestamp}] ✅ Конфигурация " f"загружена/обновлена")
 
                 # Загружаем правила из Google Sheets
                 self._load_from_google_sheets()

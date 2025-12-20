@@ -80,8 +80,7 @@ class GoogleSheetsLoader:
 
         except Exception as e:
             print(
-                f"❌ Ошибка загрузки кастомных правил "
-                f"из Google Sheets: {e}"
+                f"❌ Ошибка загрузки кастомных правил " f"из Google Sheets: {e}"
             )
             return []
 
@@ -120,8 +119,7 @@ class GoogleSheetsLoader:
 
         except Exception as e:
             print(
-                f"❌ Ошибка загрузки правил каналов "
-                f"из Google Sheets: {e}"
+                f"❌ Ошибка загрузки правил каналов " f"из Google Sheets: {e}"
             )
             return {}
 

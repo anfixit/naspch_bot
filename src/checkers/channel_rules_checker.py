@@ -78,9 +78,7 @@ class ChannelRulesChecker(BaseChecker):
         first_line = lines[0]
 
         # Ищем название канала в формате "ТГ-канал Название"
-        match = re.search(
-            r"ТГ-канал\s+([^\(]+)", first_line, re.IGNORECASE
-        )
+        match = re.search(r"ТГ-канал\s+([^\(]+)", first_line, re.IGNORECASE)
         if match:
             return match.group(1).strip()
 

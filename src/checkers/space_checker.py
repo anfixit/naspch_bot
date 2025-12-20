@@ -83,18 +83,14 @@ class SpaceChecker(BaseChecker):
 
         return errors
 
-    def _check_no_space_after_punct(
-        self, text: str
-    ) -> List[Dict[str, Any]]:
+    def _check_no_space_after_punct(self, text: str) -> List[Dict[str, Any]]:
         """Проверяет отсутствие пробела после знаков препинания."""
         errors = []
         pattern = r"(\S+)([,.!?;:])([а-яА-ЯёЁa-zA-Z]\S*)"
 
         for match in re.finditer(pattern, text):
             context = match.group(0)
-            suggestion = (
-                f"{match.group(1)}{match.group(2)} {match.group(3)}"
-            )
+            suggestion = f"{match.group(1)}{match.group(2)} {match.group(3)}"
 
             errors.append(
                 {
