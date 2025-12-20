@@ -11,12 +11,10 @@ class GoogleSheetsLoader:
     """Класс для загрузки правил из Google Sheets."""
 
     SCOPES = [
-        "https://www.googleapis.com/auth/spreadsheets.readonly"
+        "https://www.googleapis.com/auth/spreadsheets.readonly",
     ]
 
-    def __init__(
-        self, credentials_path: str, spreadsheet_id: str
-    ):
+    def __init__(self, credentials_path: str, spreadsheet_id: str):
         """
         Инициализация загрузчика Google Sheets.
 
@@ -40,14 +38,13 @@ class GoogleSheetsLoader:
                 return
 
             creds = Credentials.from_service_account_file(
-                self.credentials_path, scopes=self.SCOPES
+                self.credentials_path,
+                scopes=self.SCOPES,
             )
             self.client = gspread.authorize(creds)
             print("✅ Подключено к Google Sheets")
         except Exception as e:
-            print(
-                f"❌ Ошибка подключения к Google Sheets: {e}"
-            )
+            print(f"❌ Ошибка подключения к Google Sheets: {e}")
             self.client = None
 
     def load_custom_rules(self) -> List[Dict[str, Any]]:
@@ -61,14 +58,12 @@ class GoogleSheetsLoader:
             return []
 
         try:
-            sheet = self.client.open_by_key(
-                self.spreadsheet_id
-            )
+            sheet = self.client.open_by_key(self.spreadsheet_id)
             worksheet = sheet.get_worksheet(0)
 
             values = worksheet.get_all_values()[1:]
 
-            rules = []
+            rules: List[Dict[str, Any]] = []
             for row in values:
                 if len(row) >= 2 and row[0] and row[1]:
                     rules.append(
@@ -103,21 +98,19 @@ class GoogleSheetsLoader:
             return {}
 
         try:
-            sheet = self.client.open_by_key(
-                self.spreadsheet_id
-            )
+            sheet = self.client.open_by_key(self.spreadsheet_id)
             worksheet = sheet.get_worksheet(1)
 
             values = worksheet.get_all_values()[1:]
 
-            channel_rules = {}
+            channel_rules: Dict[str, Dict[str, Any]] = {}
             for row in values:
                 if len(row) >= 2 and row[0] and row[1]:
                     channel_name = row[0].strip().lower()
                     rules_text = row[1].strip()
 
                     channel_rules[channel_name] = {
-                        "signature_format": rules_text
+                        "signature_format": rules_text,
                     }
 
             print(
