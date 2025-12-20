@@ -4,7 +4,13 @@ from datetime import datetime
 from typing import Optional
 
 from telegram import Update
-from telegram.ext import Application, ContextTypes, MessageHandler, filters
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
 from .text_checker import TextChecker
 from .utils.config_loader import ConfigLoader
@@ -33,17 +39,67 @@ class SpellCheckBot:
         self.token = token
 
         # Инициализация Google Sheets (опционально)
-        google_loader = None
+        self.google_loader = None
         if google_credentials_path and google_spreadsheet_id:
-            google_loader = GoogleSheetsLoader(
+            self.google_loader = GoogleSheetsLoader(
                 google_credentials_path, google_spreadsheet_id
             )
 
         self.config_loader = ConfigLoader(
-            config_path, google_sheets_loader=google_loader
+            config_path, google_sheets_loader=self.google_loader
         )
         self.text_checker = TextChecker(self.config_loader)
         self.application: Optional[Application] = None
+
+    async def handle_reload(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """
+        Обработчик команды /reload для перезагрузки правил.
+
+        Args:
+            update: Объект обновления от Telegram
+            context: Контекст обработчика
+        """
+        if not update.message:
+            return
+
+        username = (
+            update.message.from_user.username
+            or update.message.from_user.id
+        )
+        timestamp = datetime.now().strftime("%H:%M:%S")
+
+        print(
+            f"[{timestamp}] Команда /reload от {username}"
+        )
+
+        # Перезагружаем конфигурацию
+        self.config_loader.reload()
+        self.text_checker._init_components()
+
+        # Подсчитываем правила
+        config = self.config_loader.get()
+        custom_rules_count = len(config.get("custom_rules", []))
+        channel_rules_count = len(
+            config.get("channel_rules", {})
+        )
+
+        response = (
+            "🔄 **Правила перезагружены из Google Sheets!**\n\n"
+            f"📌 Кастомных правил: {custom_rules_count}\n"
+            f"📢 Правил каналов: {channel_rules_count}"
+        )
+
+        await update.message.reply_text(
+            response, parse_mode="Markdown"
+        )
+
+        print(
+            f"[{timestamp}] Правила перезагружены: "
+            f"{custom_rules_count} кастомных, "
+            f"{channel_rules_count} каналов"
+        )
 
     async def handle_message(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
@@ -66,12 +122,15 @@ class SpellCheckBot:
 
         # Логируем обработку
         username = (
-            update.message.from_user.username or update.message.from_user.id
+            update.message.from_user.username
+            or update.message.from_user.id
         )
         timestamp = datetime.now().strftime("%H:%M:%S")
 
         print(f"\n{'=' * 50}")
-        print(f"[{timestamp}] Проверяю сообщение от {username}")
+        print(
+            f"[{timestamp}] Проверяю сообщение от {username}"
+        )
 
         # Выполняем проверку
         response = self.text_checker.check_text(text)
@@ -116,9 +175,14 @@ class SpellCheckBot:
         )
 
         # Создаем приложение
-        self.application = Application.builder().token(self.token).build()
+        self.application = (
+            Application.builder().token(self.token).build()
+        )
 
         # Добавляем обработчики
+        self.application.add_handler(
+            CommandHandler("reload", self.handle_reload)
+        )
         self.application.add_handler(
             MessageHandler(
                 filters.TEXT & ~filters.COMMAND, self.handle_message
@@ -127,7 +191,11 @@ class SpellCheckBot:
         self.application.add_error_handler(self.error_handler)
 
         print("✅ Бот запущен и готов к работе!")
+        print("💡 Команды:")
+        print("   /reload - перезагрузить правила из Google Sheets")
         print("⏹️  Нажмите Ctrl+C для остановки\n")
 
         # Запускаем бота
-        self.application.run_polling(allowed_updates=Update.ALL_TYPES)
+        self.application.run_polling(
+            allowed_updates=Update.ALL_TYPES
+        )
