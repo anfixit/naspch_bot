@@ -53,12 +53,13 @@ class SpellCheckBot:
         self.application: Optional[Application] = None
 
     async def auto_reload_rules(self) -> None:
-        """Автоматически перезагружает правила каждый час."""
+        """Автоматически перезагружает правила каждые 3 часа."""
         while True:
-            await asyncio.sleep(3600)  # 1 час
+            await asyncio.sleep(10800)  # 3 часа
             timestamp = datetime.now().strftime("%H:%M:%S")
             print(
-                f"[{timestamp}] 🔄 Автоматическое обновление правил..."
+                f"[{timestamp}] 🔄 Автообновление правил "
+                f"из Google Sheets..."
             )
 
             self.config_loader.reload()
@@ -70,20 +71,25 @@ class SpellCheckBot:
 
             print(
                 f"[{timestamp}] ✅ Правила обновлены: "
-                f"{custom_count} кастомных, {channel_count} каналов"
+                f"{custom_count} кастомных, "
+                f"{channel_count} каналов"
             )
 
     async def handle_reload(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """
-        Обработчик команды /reload (скрытая).
+        Обработчик команды /reload (скрытая, только в ЛС).
 
         Args:
             update: Объект обновления от Telegram
             context: Контекст обработчика
         """
         if not update.message:
+            return
+
+        # Игнорируем команды в группах
+        if update.message.chat.type != "private":
             return
 
         username = (
@@ -115,7 +121,8 @@ class SpellCheckBot:
 
         print(
             f"[{timestamp}] Правила обновлены: "
-            f"{custom_count} кастомных, {channel_count} каналов"
+            f"{custom_count} кастомных, "
+            f"{channel_count} каналов"
         )
 
     async def handle_message(
@@ -202,7 +209,7 @@ class SpellCheckBot:
             f"{config.get('settings', {}).get('min_text_length', 50)} "
             f"символов"
         )
-        print("🔄 Автообновление правил: каждый час")
+        print("🔄 Автообновление правил: каждые 3 часа")
         print("")
 
         # Создаем приложение
@@ -225,7 +232,7 @@ class SpellCheckBot:
         self.application.add_error_handler(self.error_handler)
 
         print("✅ Бот запущен и готов к работе!")
-        print("💡 Скрытая команда: /reload")
+        print("💡 Скрытая команда /reload (только в ЛС)")
         print("⏹️  Нажмите Ctrl+C для остановки\n")
 
         # Запускаем бота
