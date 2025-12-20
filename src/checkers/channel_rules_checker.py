@@ -78,7 +78,9 @@ class ChannelRulesChecker(BaseChecker):
         first_line = lines[0]
 
         # Ищем название канала в формате "ТГ-канал Название"
-        match = re.search(r"ТГ-канал\s+([^\(]+)", first_line, re.IGNORECASE)
+        match = re.search(
+            r"ТГ-канал\s+([^\(]+)", first_line, re.IGNORECASE
+        )
         if match:
             return match.group(1).strip()
 
@@ -107,7 +109,10 @@ class ChannelRulesChecker(BaseChecker):
             errors.append(
                 {
                     "type": "channel_signature",
-                    "message": f"Отсутствует подпись канала для {channel_name}",
+                    "message": (
+                        f"Отсутствует подпись канала "
+                        f"для {channel_name}"
+                    ),
                     "expected": expected_format,
                 }
             )
@@ -119,7 +124,10 @@ class ChannelRulesChecker(BaseChecker):
         # Проверяем формат подписи
         if "перенос строки" in expected_format.lower():
             # Подпись должна быть на новой строке
-            if signature_pos == 0 or text[signature_pos - 1] != "\n":
+            if (
+                signature_pos == 0
+                or text[signature_pos - 1] != "\n"
+            ):
                 errors.append(
                     {
                         "type": "channel_signature",
@@ -133,7 +141,10 @@ class ChannelRulesChecker(BaseChecker):
 
         elif "пробел" in expected_format.lower():
             # Подпись должна быть через пробел
-            if signature_pos > 0 and text[signature_pos - 1] == "\n":
+            if (
+                signature_pos > 0
+                and text[signature_pos - 1] == "\n"
+            ):
                 errors.append(
                     {
                         "type": "channel_signature",
