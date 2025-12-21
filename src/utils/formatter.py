@@ -120,7 +120,28 @@ class ErrorFormatter:
             expected = error.get("expected", "")
 
             if expected:
-                message += f"{i}. {msg}\n   Ожидается: {expected}\n"
+                # Экранируем спецсимволы для Markdown
+                expected_escaped = (
+                    expected.replace("_", r"\_")
+                    .replace("*", r"\*")
+                    .replace("[", r"\[")
+                    .replace("]", r"\]")
+                    .replace("(", r"\(")
+                    .replace(")", r"\)")
+                    .replace("~", r"\~")
+                    .replace("`", r"\`")
+                    .replace(">", r"\>")
+                    .replace("#", r"\#")
+                    .replace("+", r"\+")
+                    .replace("-", r"\-")
+                    .replace("=", r"\=")
+                    .replace("|", r"\|")
+                    .replace("{", r"\{")
+                    .replace("}", r"\}")
+                    .replace(".", r"\.")
+                    .replace("!", r"\!")
+                )
+                message += f"{i}. {msg}\n   Ожидается: {expected_escaped}\n"
             else:
                 message += f"{i}. {msg}\n"
 
