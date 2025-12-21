@@ -112,6 +112,9 @@ class ChannelRulesChecker(BaseChecker):
 
         # Проверяем что текст заканчивается на ожидаемую строку
         if not content.endswith(expected_ending):
+            # Заменяем невидимые символы на видимые для отображения
+            expected_display = expected_ending.replace("\n", "↵")
+
             errors.append(
                 {
                     "type": "channel_signature",
@@ -119,7 +122,7 @@ class ChannelRulesChecker(BaseChecker):
                         f"Неправильная подпись для канала "
                         f"{channel_name}"
                     ),
-                    "expected": f"Ожидается: `{expected_ending}`",
+                    "expected": f"Ожидается: `{expected_display}`",
                 }
             )
 
