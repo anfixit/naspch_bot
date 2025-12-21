@@ -51,6 +51,7 @@ class SpellCheckBot:
         )
         self.text_checker = TextChecker(self.config_loader)
         self.application: Optional[Application] = None
+        self._reload_task = None
 
     async def auto_reload_rules(self) -> None:
         """Автоматически перезагружает правила каждые 3 часа."""
@@ -193,7 +194,8 @@ class SpellCheckBot:
             application: Приложение бота
         """
         # Запускаем автоматическое обновление правил
-        asyncio.create_task(self.auto_reload_rules())
+        # Сохраняем ссылку на задачу, чтобы избежать garbage collection
+        self._reload_task = asyncio.create_task(self.auto_reload_rules())
 
     def run(self) -> None:
         """Запускает бота."""
