@@ -112,8 +112,10 @@ class ChannelRulesChecker(BaseChecker):
 
         # Проверяем что текст заканчивается на ожидаемую строку
         if not content.endswith(expected_ending):
-            # Заменяем невидимые символы на видимые для отображения
-            expected_display = expected_ending.replace("\n", "↵")
+            # Заменяем перенос строки на понятный текст
+            expected_display = expected_ending.replace(
+                "\n", "[новая строка]"
+            )
 
             errors.append(
                 {
