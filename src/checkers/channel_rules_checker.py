@@ -119,10 +119,7 @@ class ChannelRulesChecker(BaseChecker):
                         f"Неправильная подпись для канала "
                         f"{channel_name}"
                     ),
-                    "expected": (
-                        f"Текст должен заканчиваться на: "
-                        f"«{expected_ending}»"
-                    ),
+                    "expected": f"Ожидается: `{expected_ending}`",
                 }
             )
 
