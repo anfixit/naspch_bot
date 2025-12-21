@@ -40,14 +40,22 @@ class ChannelRulesChecker(BaseChecker):
         if not channel_name:
             channel_name = self._extract_channel_name(text)
 
+        print(f"     DEBUG: Извлеченное название канала: '{channel_name}'")
+
         if not channel_name:
+            print("     DEBUG: Название канала не найдено")
             return []
 
         channel_key = channel_name.lower()
+        print(f"     DEBUG: Ключ канала: '{channel_key}'")
+        print(f"     DEBUG: Доступные каналы: {list(self.channel_rules.keys())}")
+
         if channel_key not in self.channel_rules:
+            print(f"     DEBUG: Канал '{channel_key}' не найден в правилах")
             return []
 
         rules = self.channel_rules[channel_key]
+        print(f"     DEBUG: Правило: {rules}")
         errors = []
 
         # Проверяем правило подписи
@@ -59,6 +67,7 @@ class ChannelRulesChecker(BaseChecker):
                 )
             )
 
+        print(f"     DEBUG: Найдено ошибок: {len(errors)}")
         return errors
 
     def _extract_channel_name(self, text: str) -> str:
@@ -109,6 +118,10 @@ class ChannelRulesChecker(BaseChecker):
 
         # Берем текст КАК ЕСТЬ из таблицы
         content = lines[1]
+
+        print(f"     DEBUG: Текст заканчивается на: {repr(content[-30:])}")
+        print(f"     DEBUG: Ожидается: {repr(expected_ending)}")
+        print(f"     DEBUG: Совпадает: {content.endswith(expected_ending)}")
 
         # Проверяем что текст заканчивается на ожидаемую строку
         if not content.endswith(expected_ending):
