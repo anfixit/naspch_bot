@@ -86,11 +86,19 @@ class ConfigLoader:
 
     def reload(self) -> bool:
         """
-        Перезагружает конфигурацию если файл изменился.
+        Перезагружает конфигурацию принудительно из Google Sheets.
 
         Returns:
             True если конфигурация была обновлена
         """
+        # Принудительно загружаем из Google Sheets
+        if self.google_sheets_loader:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            print(f"[{timestamp}] 🔄 Перезагрузка из Google Sheets")
+            self._load_from_google_sheets()
+            return True
+
+        # Если нет Google Sheets, проверяем файл
         old_mtime = self.last_modified
         self._load()
         return self.last_modified > old_mtime
