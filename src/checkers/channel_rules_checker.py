@@ -1,6 +1,5 @@
 """Проверка правил для конкретных каналов."""
 
-import re
 from typing import Any, Dict, List
 
 from .base_checker import BaseChecker
@@ -75,14 +74,13 @@ class ChannelRulesChecker(BaseChecker):
         if not lines:
             return ""
 
-        first_line = lines[0]
+        first_line = lines[0].lower()
 
-        # Ищем название канала в формате "ТГ-канал Название"
-        match = re.search(
-            r"ТГ-канал\s+([^:]+)", first_line, re.IGNORECASE
-        )
-        if match:
-            return match.group(1).strip()
+        # Проверяем каждый канал из таблицы
+        for channel_key in self.channel_rules.keys():
+            if channel_key in first_line:
+                # Возвращаем название с заглавной буквы
+                return channel_key.title()
 
         return ""
 
