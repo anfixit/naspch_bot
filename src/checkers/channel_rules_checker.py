@@ -48,7 +48,10 @@ class ChannelRulesChecker(BaseChecker):
 
         channel_key = channel_name.lower()
         print(f"     DEBUG: Ключ канала: '{channel_key}'")
-        print(f"     DEBUG: Доступные каналы: {list(self.channel_rules.keys())}")
+        print(
+                    f"     DEBUG: Доступные каналы: "
+                    f"{list(self.channel_rules.keys())}"
+                )
 
         if channel_key not in self.channel_rules:
             print(f"     DEBUG: Канал '{channel_key}' не найден в правилах")
