@@ -109,6 +109,9 @@ class GoogleSheetsLoader:
                     channel_name = row[0].strip().lower()
                     rules_text = row[1].strip()
 
+                    # Заменяем NEWLINE на реальный перенос строки
+                    rules_text = rules_text.replace("NEWLINE", "\n")
+
                     channel_rules[channel_name] = {
                         "signature_format": rules_text,
                     }
@@ -134,3 +137,10 @@ class GoogleSheetsLoader:
             True если подключение активно
         """
         return self.client is not None
+```
+
+**Изменение:** строка 115 - добавлена замена `NEWLINE` на `\n`.
+
+Теперь в Google Sheets пиши:
+```
+NEWLINE @filmkenner
