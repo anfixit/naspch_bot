@@ -137,10 +137,3 @@ class GoogleSheetsLoader:
             True если подключение активно
         """
         return self.client is not None
-```
-
-**Изменение:** строка 115 - добавлена замена `NEWLINE` на `\n`.
-
-Теперь в Google Sheets пиши:
-```
-NEWLINE @filmkenner
