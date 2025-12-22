@@ -34,7 +34,8 @@ class MessageValidator:
             return False
 
         first_line = lines[0]
-        return bool(re.search(r"t\.me/\w+", first_line))
+        # Ловим ЛЮБУЮ ссылку t.me/ (любые символы до пробела)
+        return bool(re.search(r"t\.me/\S+", first_line))
 
     def extract_text_to_check(self, text: str) -> Optional[str]:
         """
